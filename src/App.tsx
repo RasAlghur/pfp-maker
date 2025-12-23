@@ -416,7 +416,7 @@ export default function App() {
                           bg-secondary/50
                           rounded-lg
                           hover:bg-secondary/80
-                          transition-colors duration-200
+                          transition-colors duration-200 text-black
                         "
                         >
                           <span
@@ -430,8 +430,7 @@ export default function App() {
                           <span
                             className="
                             font-bold
-                            bg-linear-to-r from-usa-red to-usa-blue
-                            bg-clip-text text-transparent
+                           
                             text-sm
                           "
                           >
