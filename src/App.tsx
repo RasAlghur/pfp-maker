@@ -1,14 +1,14 @@
 // src/App.tsx
-import { useMemo, useRef, useState } from 'react';
-import { PARTS, CATEGORIES } from './data/parts';
-import type { Part } from './types';
-import CanvasPreview from './components/CanvasPreview';
-import Selector from './components/Selector';
-import Controls from './components/Controls';
-import { pickRandom } from './utils/random';
-import { resampleToSize } from './utils/image';
-
-
+import { useMemo, useRef, useState } from "react";
+import { PARTS, CATEGORIES } from "./data/parts";
+import type { Part } from "./types";
+import CanvasPreview from "./components/CanvasPreview";
+import Selector from "./components/Selector";
+import Controls from "./components/Controls";
+import { pickRandom } from "./utils/random";
+import { resampleToSize } from "./utils/image";
+import { BsSliders } from "react-icons/bs";
+import { FaLightbulb } from "react-icons/fa";
 
 export default function App() {
   const svgRef = useRef<SVGSVGElement>(null!);
@@ -27,12 +27,15 @@ export default function App() {
     initialSelections[cat] = partsByCategory[cat]?.[0];
   });
 
-  const [selections, setSelections] = useState<Record<string, Part | undefined>>(initialSelections);
-  const [randomizeFlags, setRandomizeFlags] = useState<Record<string, boolean>>(() => {
-    const r: Record<string, boolean> = {};
-    CATEGORIES.forEach((c) => (r[c] = false));
-    return r;
-  });
+  const [selections, setSelections] =
+    useState<Record<string, Part | undefined>>(initialSelections);
+  const [randomizeFlags, setRandomizeFlags] = useState<Record<string, boolean>>(
+    () => {
+      const r: Record<string, boolean> = {};
+      CATEGORIES.forEach((c) => (r[c] = false));
+      return r;
+    }
+  );
 
   function handleSelect(category: string, partId: string) {
     const p = partsByCategory[category].find((x) => x.id === partId);
@@ -68,148 +71,389 @@ export default function App() {
   async function downloadPNG() {
     try {
       const size = 1080;
-      const orderList = ['backgrounds', 'bodies', 'eyes', 'heads', 'mouths', 'stickers'];
+      const orderList = [
+        "backgrounds",
+        "bodies",
+        "eyes",
+        "heads",
+        "mouths",
+        "stickers",
+      ];
 
       const selectedParts = orderList
         .map((cat) => selections[cat])
-        .filter(Boolean) as (Part & { bbox?: { x: number; y: number; w: number; h: number } })[];
+        .filter(Boolean) as (Part & {
+        bbox?: { x: number; y: number; w: number; h: number };
+      })[];
 
-      // For each selected part we want an embedded PNG dataURL sized to `size`.
-      // Use resampled image (which returns a dataURL sized to full canvas).
-      // If you want parts to appear in their bbox (not full-bleed), we will crop with pixel coords via SVG <image> placement.
-      const dataUrls = await Promise.all(selectedParts.map(async (p) => {
-        try {
-          // resample whole asset to size x size (so its pixels = export canvas).
-          // This keeps quality consistent. If your assets already are 1080, this is fast.
-          return await resampleToSize(p.src, size);
-        } catch (err) {
-          console.warn('resample error, falling back to original src', p.id, err);
-          // fallback: convert original src to data URL via fetch
-          const r = await fetch(p.src);
-          const b = await r.blob();
-          return await new Promise<string>((resolve, reject) => {
-            const fr = new FileReader();
-            fr.onload = () => resolve(fr.result as string);
-            fr.onerror = reject;
-            fr.readAsDataURL(b);
-          });
-        }
-      }));
+      const dataUrls = await Promise.all(
+        selectedParts.map(async (p) => {
+          try {
+            return await resampleToSize(p.src, size);
+          } catch (err) {
+            console.warn(
+              "resample error, falling back to original src",
+              p.id,
+              err
+            );
+            const r = await fetch(p.src);
+            const b = await r.blob();
+            return await new Promise<string>((resolve, reject) => {
+              const fr = new FileReader();
+              fr.onload = () => resolve(fr.result as string);
+              fr.onerror = reject;
+              fr.readAsDataURL(b);
+            });
+          }
+        })
+      );
 
-      // Build SVG markup using each part's bbox (pixel coords) but the image href is a full-size dataURL.
-      const imagesMarkup = selectedParts.map((p, i) => {
-        const dataUrl = dataUrls[i];
-        if (p.bbox) {
-          const x = Math.round(p.bbox.x * size);
-          const y = Math.round(p.bbox.y * size);
-          const w = Math.round(p.bbox.w * size);
-          const h = Math.round(p.bbox.h * size);
-          return `<image href="${dataUrl}" x="${x}" y="${y}" width="${w}" height="${h}" preserveAspectRatio="xMidYMid slice" />`;
-        } else {
-          return `<image href="${dataUrl}" x="0" y="0" width="${size}" height="${size}" preserveAspectRatio="xMidYMid slice" />`;
-        }
-      }).join('\n');
+      const imagesMarkup = selectedParts
+        .map((p, i) => {
+          const dataUrl = dataUrls[i];
+          if (p.bbox) {
+            const x = Math.round(p.bbox.x * size);
+            const y = Math.round(p.bbox.y * size);
+            const w = Math.round(p.bbox.w * size);
+            const h = Math.round(p.bbox.h * size);
+            return `<image href="${dataUrl}" x="${x}" y="${y}" width="${w}" height="${h}" preserveAspectRatio="xMidYMid slice" />`;
+          } else {
+            return `<image href="${dataUrl}" x="0" y="0" width="${size}" height="${size}" preserveAspectRatio="xMidYMid slice" />`;
+          }
+        })
+        .join("\n");
 
       const svgString = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">${imagesMarkup}</svg>`;
-      const svgDataUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgString)}`;
+      const svgDataUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(
+        svgString
+      )}`;
 
       const img = new Image();
       img.src = svgDataUrl;
-      await new Promise<void>((resolve, reject) => { img.onload = () => resolve(); img.onerror = (e) => reject(e); });
+      await new Promise<void>((resolve, reject) => {
+        img.onload = () => resolve();
+        img.onerror = (e) => reject(e);
+      });
 
-      const canvas = document.createElement('canvas');
+      const canvas = document.createElement("canvas");
       canvas.width = size;
       canvas.height = size;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) throw new Error('2D context not available');
+      const ctx = canvas.getContext("2d");
+      if (!ctx) throw new Error("2D context not available");
 
       ctx.drawImage(img, 0, 0, size, size);
 
       canvas.toBlob((blob) => {
         if (!blob) return;
         const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
+        const a = document.createElement("a");
         a.href = url;
         a.download = `meme-pfp-${size}x${size}.png`;
         a.click();
         URL.revokeObjectURL(url);
-      }, 'image/png');
-
+      }, "image/png");
     } catch (err) {
-      console.error('Failed to export PNG', err);
-      alert('Export failed — check console for details. If images are hosted on another domain, CORS may block export.');
+      console.error("Failed to export PNG", err);
+      alert("Export failed — check console for details.");
     }
   }
 
-
-  // ----------------------
-
   return (
-    <div className="min-h-screen p-6 bg-slate-50">
-      <div className="container mx-auto grid grid-cols-1 md:grid-cols-12 gap-6 max-w-6xl">
-        {/* LEFT: Selectors (narrow) */}
-        <aside className="col-span-12 md:col-span-4">
-          <div className="bg-white rounded-lg shadow-sm p-4 space-y-4">
-            <h2 className="text-lg font-semibold mb-2">Traits</h2>
-            {CATEGORIES.map((cat) => (
-              <div key={cat} className="bg-slate-50 rounded-md">
-                <Selector
-                  category={cat}
-                  parts={partsByCategory[cat] || []}
-                  selectedId={selections[cat]?.id}
-                  onSelect={(pid) => handleSelect(cat, pid)}
-                  randomizeEnabled={!!randomizeFlags[cat]}
-                  onToggleRandomize={handleToggleRandomize}
-                />
-              </div>
-            ))}
-            <div className="mt-3 text-sm text-slate-600">
-              Tip: use the Randomize checkbox per category, then press <strong>Randomize</strong>.
-            </div>
+    <div
+      className="min-h-screen bg-linear-to-br
+        from-usa-red/15
+        via-usa-blue/15
+        to-yellow-300/20 p-4 lg:p-6 font-body"
+    >
+      {/* Halftone background */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(0,0,0,0.08)_1px,transparent_0)] bg-size-[24px_24px] opacity-10" />
+      </div>
+
+      <div className="relative container mx-auto max-w-7xl">
+        {/* Header */}
+        <header className="mb-8 lg:mb-12 text-center animate-fade-up">
+          <h1 className="font-display font-extrabold tracking-tight text-4xl md:text-5xl lg:text-6xl mb-3">
+            <span
+              className="
+    bg-gradient-to-r from-red-600 to-blue-600
+    bg-clip-text text-transparent
+    drop-shadow-[2px_2px_0_#fff]
+  "
+            >
+              MEME PFP MAKER
+            </span>
+          </h1>
+
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Create patriotic meme profile pictures with freedom, fur, and memes.
+          </p>
+
+          {/* Meme badge */}
+          <div className="inline-block px-4 py-2 bg-yellow-300 text-black font-display font-bold rounded-full -rotate-1 shadow-md mt-4 wiggle-slow">
+            🇺🇸 Build Your Bear 🇺🇸
           </div>
-        </aside>
+        </header>
 
-        {/* RIGHT: Preview + controls (wide) */}
-        <main className="col-span-12 md:col-span-8">
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-start justify-between">
-              <h1 className="text-2xl font-bold">Meme PFP Maker</h1>
-              <div className="text-sm text-slate-500">Preview & Export</div>
-            </div>
-
-            <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                {/* Preview box */}
-                <CanvasPreview selections={selections} svgRef={svgRef} size={1080} />
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
+          {/* LEFT: Traits Selector */}
+          <aside className="lg:col-span-4">
+            <div
+              className="
+              bg-white/90 backdrop-blur-sm
+              rounded-2xl
+              border-2 border-usa-blue/20
+              shadow-[0_12px_40px_rgba(0,0,0,0.15)]
+              p-5 lg:p-6
+              space-y-4
+              hover:shadow-[0_20px_50px_rgba(0,0,0,0.2)]
+              transition-shadow duration-300
+            "
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div
+                  className="
+                  bg-linear-to-r from-usa-red to-usa-blue
+                  p-2 rounded-xl
+                  -rotate-2
+                "
+                >
+                  <span className="text-2xl">
+                    <BsSliders className="text-red-500 text-xl" />
+                  </span>
+                </div>
+                <h2 className="font-display text-2xl font-bold text-foreground">
+                  Traits
+                </h2>
               </div>
 
-              <div className="flex flex-col gap-4">
-                {/* Controls */}
-                <Controls onRandomizeAll={randomizeAll} onReset={reset} onDownload={downloadPNG} />
+              {CATEGORIES.map((cat) => (
+                <div
+                  key={cat}
+                  className="
+                  bg-secondary/70
+                  rounded-xl
+                  border border-usa-blue/10
+                  overflow-hidden
+                  hover:border-usa-blue/30
+                  transition-all duration-200
+                "
+                >
+                  <Selector
+                    category={cat}
+                    parts={partsByCategory[cat] || []}
+                    selectedId={selections[cat]?.id}
+                    onSelect={(pid) => handleSelect(cat, pid)}
+                    randomizeEnabled={!!randomizeFlags[cat]}
+                    onToggleRandomize={handleToggleRandomize}
+                  />
+                </div>
+              ))}
 
-                {/* Quick summary of selections */}
-                <div className="p-3 border rounded-md bg-slate-50">
-                  <h3 className="font-medium mb-2">Current selection</h3>
-                  <ul className="text-sm space-y-1">
-                    {CATEGORIES.map((cat) => (
-                      <li key={cat} className="flex justify-between">
-                        <span className="capitalize">{cat}</span>
-                        <span className="text-slate-700">
-                          {selections[cat]?.name ?? <span className="text-slate-400">—</span>}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
+              {/* Tip */}
+              <div
+                className="
+                mt-6 p-4
+                bg-linear-to-r from-usa-blue/5 to-usa-red/5
+                border border-usa-blue/20
+                rounded-xl
+                text-sm text-muted-foreground
+              "
+              >
+                <div className="flex items-start gap-3">
+                  <span className="text-2xl">
+                    <FaLightbulb className="text-yellow-500 text-xl" />
+                  </span>
+                  <div>
+                    <p className="font-semibold text-foreground mb-1">
+                      Pro Tip
+                    </p>
+                    <p>
+                      Enable <strong>Randomize</strong> for traits you want to
+                      randomize, then hit the Randomize button!
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </aside>
+
+          {/* RIGHT: Preview & Controls */}
+          <main className="lg:col-span-8">
+            <div
+              className="
+              bg-white/90 backdrop-blur-sm
+              rounded-2xl
+              border-2 border-usa-blue/20
+              shadow-[0_12px_40px_rgba(0,0,0,0.15)]
+              p-5 lg:p-6
+              hover:shadow-[0_20px_50px_rgba(0,0,0,0.2)]
+              transition-shadow duration-300
+            "
+            >
+              {/* Preview Header */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6">
+                <div>
+                  <h3
+                    className="
+                    font-display text-2xl font-bold
+                    bg-linear-to-r from-usa-red to-usa-blue
+                    bg-clip-text text-transparent
+                  "
+                  >
+                    Preview & Export
+                  </h3>
+                  <p className="text-sm sm:text-lg text-muted-foreground mt-1">
+                    Your patriotic masterpiece awaits
+                  </p>
+                </div>
+                <div
+                  className="
+                  px-3 py-1
+                  bg-yellow-300 text-black
+                  text-sm font-bold
+                  rounded-full
+                  rotate-2
+                  mt-2 sm:mt-0
+                "
+                >
+                  HD 1080×1080
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+                {/* Preview Box */}
+                <div className="flex flex-col gap-4">
+                  <CanvasPreview
+                    selections={selections}
+                    svgRef={svgRef}
+                    size={1080}
+                  />
+                  {/* Export Note */}
+                  <div
+                    className="
+                    p-4
+                    bg-linear-to-r from-usa-blue/5 to-usa-red/5
+                    border border-usa-blue/20
+                    rounded-xl
+                  "
+                  >
+                    <div className="flex items-center gap-3">
+                      <span
+                        className="
+                        bg-usa-blue text-white
+                        p-2 rounded-lg
+                        text-lg
+                      "
+                      >
+                        ⚡
+                      </span>
+                      <div>
+                        <p className="font-semibold text-foreground">
+                          Export Ready
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Download as <strong>1080×1080 PNG</strong> — perfect
+                          for profile pictures and memes.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
-                {/* Export note */}
-                <div className="text-xs text-slate-500">
-                  Export resolution: <strong>1080×1080</strong>. Preview resolution: 1080×1080.
+                {/* Controls & Info */}
+                <div className="flex flex-col gap-6">
+                  {/* Controls */}
+                  <div
+                    className="
+                    p-5
+                    bg-linear-to-br from-secondary to-background
+                    rounded-xl
+                    border border-usa-blue/20
+                  "
+                  >
+                    <h4 className="font-display font-bold text-lg mb-4">
+                      Actions
+                    </h4>
+                    <Controls
+                      onRandomizeAll={randomizeAll}
+                      onReset={reset}
+                      onDownload={downloadPNG}
+                    />
+                  </div>
+
+                  {/* Current Selection */}
+                  <div
+                    className="
+                    p-5
+                    bg-white
+                    rounded-xl
+                    border-2 border-usa-blue/30
+                    shadow-[0_8px_25px_rgba(0,0,0,0.08)]
+                  "
+                  >
+                    <h4
+                      className="
+                      font-display font-bold text-lg mb-4
+                      flex items-center gap-2
+                    "
+                    >
+                      <span
+                        className="
+                        bg-linear-to-r from-usa-red to-usa-blue
+                        w-2 h-6 rounded-full
+                      "
+                      />
+                      Current Selection
+                    </h4>
+                    <ul className="space-y-3">
+                      {CATEGORIES.map((cat) => (
+                        <li
+                          key={cat}
+                          className="
+                          flex items-center justify-between
+                          p-2
+                          bg-secondary/50
+                          rounded-lg
+                          hover:bg-secondary/80
+                          transition-colors duration-200
+                        "
+                        >
+                          <span
+                            className="
+                            font-medium capitalize
+                            text-sm
+                          "
+                          >
+                            {cat}
+                          </span>
+                          <span
+                            className="
+                            font-bold
+                            bg-linear-to-r from-usa-red to-usa-blue
+                            bg-clip-text text-transparent
+                            text-sm
+                          "
+                          >
+                            {selections[cat]?.name ?? "—"}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </main>
+          </main>
+        </div>
+
+        {/* Footer */}
+        <footer className="mt-12 text-center text-sm text-muted-foreground">
+          <p>
+            Made with <span className="text-usa-red">❤️</span> and{" "}
+            <span className="text-usa-blue">🦅 FREEDOM 🦅</span>
+          </p>
+        </footer>
       </div>
     </div>
   );

@@ -1,70 +1,209 @@
 @import "tailwindcss";
 
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+  /* Core palette - VIBRANT red, white, blue */
+  --background: 0 0% 100%;
+  --foreground: 220 70% 15%;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  --card: 0 0% 100%;
+  --card-foreground: 220 70% 15%;
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  --popover: 0 0% 100%;
+  --popover-foreground: 220 70% 15%;
+
+  /* Vibrant USA Blue - primary brand */
+  --primary: 220 90% 40%;
+  --primary-foreground: 0 0% 100%;
+
+  /* Light blue-gray secondary */
+  --secondary: 220 30% 95%;
+  --secondary-foreground: 220 70% 15%;
+
+  --muted: 220 20% 92%;
+  --muted-foreground: 220 15% 40%;
+
+  /* Vibrant USA Red accent */
+  --accent: 355 90% 48%;
+  --accent-foreground: 0 0% 100%;
+
+  --destructive: 355 90% 48%;
+  --destructive-foreground: 0 0% 100%;
+
+  --border: 220 25% 88%;
+  --input: 220 25% 88%;
+  --ring: 220 90% 40%;
+
+  --radius: 0.5rem;
+
+  /* USA Colors - Bold & Vibrant */
+  --usa-red: 355 90% 48%;
+  --usa-blue: 220 90% 40%;
+  --usa-white: 0 0% 100%;
+
+  --navy: 220 85% 25%;
+  --navy-light: 220 75% 45%;
+  --crimson: 355 90% 48%;
+  --crimson-muted: 355 70% 55%;
+  --cream: 40 30% 97%;
+
+  /* Typography */
+  --font-display: "Playfair Display", Georgia, serif;
+  --font-body: "Inter", system-ui, sans-serif;
+
+  /* Shadows */
+  --shadow-subtle: 0 1px 3px 0 hsl(220 40% 13% / 0.04);
+  --shadow-soft: 0 4px 20px -4px hsl(220 40% 13% / 0.08);
+  --shadow-elevated: 0 12px 40px -8px hsl(220 40% 13% / 0.12);
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+.dark {
+  --background: 220 40% 8%;
+  --foreground: 0 0% 95%;
+
+  --card: 220 40% 10%;
+  --card-foreground: 0 0% 95%;
+
+  --popover: 220 40% 10%;
+  --popover-foreground: 0 0% 95%;
+
+  --primary: 0 0% 98%;
+  --primary-foreground: 220 55% 20%;
+
+  --secondary: 220 30% 15%;
+  --secondary-foreground: 0 0% 95%;
+
+  --muted: 220 30% 18%;
+  --muted-foreground: 220 10% 60%;
+
+  --accent: 0 60% 55%;
+  --accent-foreground: 0 0% 98%;
+
+  --destructive: 0 62% 50%;
+  --destructive-foreground: 0 0% 98%;
+
+  --border: 220 30% 18%;
+  --input: 220 30% 18%;
+  --ring: 0 0% 80%;
+
+  --navy: 220 40% 75%;
+  --navy-light: 220 30% 60%;
+  --crimson: 0 60% 60%;
+  --crimson-muted: 0 40% 50%;
+  --cream: 220 30% 12%;
 }
 
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+html {
+  scroll-behavior: smooth;
 }
 
 button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
   cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
+body {
+  background-color: var(--background);
+  font-family: var(--font-body);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-display);
+}
+
+@layer utilities {
+  .font-display {
+    font-family: var(--font-display);
   }
-  a:hover {
-    color: #747bff;
+
+  .font-body {
+    font-family: var(--font-body);
   }
-  button {
-    background-color: #f9f9f9;
+
+  .text-balance {
+    text-wrap: balance;
   }
+
+  .animate-fade-up {
+    animation: fadeUp 0.6s ease-out forwards;
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.4s ease-out forwards;
+  }
+
+  .stagger-1 {
+    animation-delay: 0.1s;
+  }
+  .stagger-2 {
+    animation-delay: 0.2s;
+  }
+  .stagger-3 {
+    animation-delay: 0.3s;
+  }
+  .stagger-4 {
+    animation-delay: 0.4s;
+  }
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes wiggle {
+  0%,
+  100% {
+    transform: rotate(0deg) translateX(0);
+  }
+  25% {
+    transform: rotate(1.5deg) translateX(1px);
+  }
+  75% {
+    transform: rotate(-1.5deg) translateX(-1px);
+  }
+}
+
+/* Optional: Enhanced wiggle for stars */
+@keyframes wiggle-star {
+  0%,
+  100% {
+    transform: rotate(0deg) scale(1);
+  }
+  25% {
+    transform: rotate(15deg) scale(1.1);
+  }
+  50% {
+    transform: rotate(0deg) scale(1);
+  }
+  75% {
+    transform: rotate(-15deg) scale(1.1);
+  }
+}
+
+.wiggle-star {
+  animation: wiggle-star 3s ease-in-out infinite;
+}
+
+/* For the preview stars */
+.star-wiggle {
+  animation: wiggle 4s ease-in-out infinite;
 }
