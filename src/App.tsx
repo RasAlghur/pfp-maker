@@ -181,18 +181,9 @@ export default function App() {
     drop-shadow-[2px_2px_0_#fff]
   "
             >
-              MEME PFP MAKER
+              MEME PFP GENERATOR
             </span>
           </h1>
-
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Create patriotic meme profile pictures with freedom, fur, and memes.
-          </p>
-
-          {/* Meme badge */}
-          <div className="inline-block px-4 py-2 bg-yellow-300 text-black font-display font-bold rounded-full -rotate-1 shadow-md mt-4 wiggle-slow">
-            🇺🇸 Build Your Bear 🇺🇸
-          </div>
         </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
@@ -291,36 +282,6 @@ export default function App() {
               transition-shadow duration-300
             "
             >
-              {/* Preview Header */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6">
-                <div>
-                  <h3
-                    className="
-                    font-display text-2xl font-bold
-                    bg-linear-to-r from-usa-red to-usa-blue
-                    bg-clip-text text-transparent
-                  "
-                  >
-                    Preview & Export
-                  </h3>
-                  <p className="text-sm sm:text-lg text-muted-foreground mt-1">
-                    Your patriotic masterpiece awaits
-                  </p>
-                </div>
-                <div
-                  className="
-                  px-3 py-1
-                  bg-yellow-300 text-black
-                  text-sm font-bold
-                  rounded-full
-                  rotate-2
-                  mt-2 sm:mt-0
-                "
-                >
-                  HD 1080×1080
-                </div>
-              </div>
-
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
                 {/* Preview Box */}
                 <div className="flex flex-col gap-4">
@@ -329,36 +290,6 @@ export default function App() {
                     svgRef={svgRef}
                     size={1080}
                   />
-                  {/* Export Note */}
-                  <div
-                    className="
-                    p-4
-                    bg-linear-to-r from-usa-blue/5 to-usa-red/5
-                    border border-usa-blue/20
-                    rounded-xl
-                  "
-                  >
-                    <div className="flex items-center gap-3">
-                      <span
-                        className="
-                        bg-usa-blue text-white
-                        p-2 rounded-lg
-                        text-lg
-                      "
-                      >
-                        ⚡
-                      </span>
-                      <div>
-                        <p className="font-semibold text-foreground">
-                          Export Ready
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          Download as <strong>1080×1080 PNG</strong> — perfect
-                          for profile pictures and memes.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
                 </div>
 
                 {/* Controls & Info */}
