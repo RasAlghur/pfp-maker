@@ -159,110 +159,103 @@ export default function App() {
   }
 
   return (
-    <div
-      className="min-h-screen bg-linear-to-br
-        from-usa-red/15
-        via-usa-blue/15
-        to-yellow-300/20 p-4 lg:p-6 font-body"
-    >
+    <div className="h-screen bg-linear-to-br from-usa-red/15 via-usa-blue/15 to-yellow-300/20 font-body overflow-hidden">
       {/* Halftone background */}
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(0,0,0,0.08)_1px,transparent_0)] bg-size-[24px_24px] opacity-10" />
       </div>
 
-      <div className="relative container mx-auto max-w-7xl">
+      <div className="h-full container mx-auto max-w-7xl px-4 lg:px-6 py-4 lg:py-6 flex flex-col">
         {/* Header */}
-        <header className="mb-8 lg:mb-12 text-center animate-fade-up">
-          <h1 className="font-display font-extrabold tracking-tight text-4xl md:text-5xl lg:text-6xl mb-3">
+        <header className="mb-4 lg:mb-6 text-center animate-fade-up shrink-0">
+          <h1 className="font-display font-extrabold tracking-tight text-2xl md:text-3xl lg:text-4xl mb-2">
             <span
               className="
-    bg-gradient-to-r from-red-600 to-blue-600
-    bg-clip-text text-transparent
-    drop-shadow-[2px_2px_0_#fff]
-  "
+                bg-gradient-to-r from-red-600 to-blue-600
+                bg-clip-text text-transparent
+                drop-shadow-[2px_2px_0_#fff]
+              "
             >
               MEME PFP GENERATOR
             </span>
           </h1>
         </header>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
+        <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6 min-h-0">
           {/* LEFT: Traits Selector */}
-          <aside className="lg:col-span-4">
+          <aside className="lg:col-span-4 flex flex-col min-h-0">
             <div
               className="
-              bg-white/90 backdrop-blur-sm
-              rounded-2xl
-              border-2 border-usa-blue/20
-              shadow-[0_12px_40px_rgba(0,0,0,0.15)]
-              p-5 lg:p-6
-              space-y-4
-              hover:shadow-[0_20px_50px_rgba(0,0,0,0.2)]
-              transition-shadow duration-300
-            "
+                bg-white/90 backdrop-blur-sm
+                rounded-2xl
+                border-2 border-usa-blue/20
+                shadow-[0_12px_40px_rgba(0,0,0,0.15)]
+                p-4 lg:p-5
+                flex flex-col min-h-0
+                hover:shadow-[0_20px_50px_rgba(0,0,0,0.2)]
+                transition-shadow duration-300
+              "
             >
-              <div className="flex items-center gap-3 mb-4">
+              <div className="flex items-center gap-3 mb-4 shrink-0">
                 <div
                   className="
-                  bg-linear-to-r from-usa-red to-usa-blue
-                  p-2 rounded-xl
-                  -rotate-2
-                "
+                    bg-linear-to-r from-usa-red to-usa-blue
+                    p-2 rounded-xl -rotate-2
+                  "
                 >
-                  <span className="text-2xl">
-                    <BsSliders className="text-red-500 text-xl" />
-                  </span>
+                  <BsSliders className="text-red-500 text-xl" />
                 </div>
-                <h2 className="font-display text-2xl font-bold text-foreground">
+                <h2 className="font-display text-xl font-bold text-foreground">
                   Traits
                 </h2>
               </div>
 
-              {CATEGORIES.map((cat) => (
-                <div
-                  key={cat}
-                  className="
-                  bg-secondary/70
-                  rounded-xl
-                  border border-usa-blue/10
-                  overflow-hidden
-                  hover:border-usa-blue/30
-                  transition-all duration-200
-                "
-                >
-                  <Selector
-                    category={cat}
-                    parts={partsByCategory[cat] || []}
-                    selectedId={selections[cat]?.id}
-                    onSelect={(pid) => handleSelect(cat, pid)}
-                    randomizeEnabled={!!randomizeFlags[cat]}
-                    onToggleRandomize={handleToggleRandomize}
-                  />
-                </div>
-              ))}
+              <div className="space-y-3 flex-1 overflow-y-auto pr-2">
+                {CATEGORIES.map((cat) => (
+                  <div
+                    key={cat}
+                    className="
+                      bg-secondary/70
+                      rounded-xl
+                      border border-usa-blue/10
+                      overflow-hidden
+                      hover:border-usa-blue/30
+                      transition-all duration-200
+                    "
+                  >
+                    <Selector
+                      category={cat}
+                      parts={partsByCategory[cat] || []}
+                      selectedId={selections[cat]?.id}
+                      onSelect={(pid) => handleSelect(cat, pid)}
+                      randomizeEnabled={!!randomizeFlags[cat]}
+                      onToggleRandomize={handleToggleRandomize}
+                    />
+                  </div>
+                ))}
 
-              {/* Tip */}
-              <div
-                className="
-                mt-6 p-4
-                bg-linear-to-r from-usa-blue/5 to-usa-red/5
-                border border-usa-blue/20
-                rounded-xl
-                text-sm text-muted-foreground
-              "
-              >
-                <div className="flex items-start gap-3">
-                  <span className="text-2xl">
-                    <FaLightbulb className="text-yellow-500 text-xl" />
-                  </span>
-                  <div>
-                    <p className="font-semibold text-foreground mb-1">
-                      Pro Tip
-                    </p>
-                    <p>
-                      Enable <strong>Randomize</strong> for traits you want to
-                      randomize, then hit the Randomize button!
-                    </p>
+                {/* Tip */}
+                <div
+                  className="
+                    mt-4 p-3
+                    bg-linear-to-r from-usa-blue/5 to-usa-red/5
+                    border border-usa-blue/20
+                    rounded-xl
+                    text-sm text-muted-foreground
+                    shrink-0
+                  "
+                >
+                  <div className="flex items-start gap-3">
+                    <FaLightbulb className="text-yellow-500 text-lg shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-semibold text-foreground mb-1">
+                        Pro Tip
+                      </p>
+                      <p className="text-xs">
+                        Enable <strong>Randomize</strong> for traits you want to
+                        randomize, then hit the Randomize button!
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -270,21 +263,22 @@ export default function App() {
           </aside>
 
           {/* RIGHT: Preview & Controls */}
-          <main className="lg:col-span-8">
+          <main className="lg:col-span-8 flex flex-col min-h-0">
             <div
               className="
-              bg-white/90 backdrop-blur-sm
-              rounded-2xl
-              border-2 border-usa-blue/20
-              shadow-[0_12px_40px_rgba(0,0,0,0.15)]
-              p-5 lg:p-6
-              hover:shadow-[0_20px_50px_rgba(0,0,0,0.2)]
-              transition-shadow duration-300
-            "
+                bg-white/90 backdrop-blur-sm
+                rounded-2xl
+                border-2 border-usa-blue/20
+                shadow-[0_12px_40px_rgba(0,0,0,0.15)]
+                p-4 lg:p-5
+                flex-1 flex flex-col min-h-0
+                hover:shadow-[0_20px_50px_rgba(0,0,0,0.2)]
+                transition-shadow duration-300
+              "
             >
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 flex-1 min-h-0">
                 {/* Preview Box */}
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-col min-h-0">
                   <CanvasPreview
                     selections={selections}
                     svgRef={svgRef}
@@ -293,17 +287,18 @@ export default function App() {
                 </div>
 
                 {/* Controls & Info */}
-                <div className="flex flex-col gap-6">
+                <div className="flex flex-col gap-4 min-h-0">
                   {/* Controls */}
                   <div
                     className="
-                    p-5
-                    bg-linear-to-br from-secondary to-background
-                    rounded-xl
-                    border border-usa-blue/20
-                  "
+                      p-4
+                      bg-linear-to-br from-secondary to-background
+                      rounded-xl
+                      border border-usa-blue/20
+                      shrink-0
+                    "
                   >
-                    <h4 className="font-display font-bold text-lg mb-4">
+                    <h4 className="font-display font-bold text-base mb-3">
                       Actions
                     </h4>
                     <Controls
@@ -316,55 +311,40 @@ export default function App() {
                   {/* Current Selection */}
                   <div
                     className="
-                    p-5
-                    bg-white
-                    rounded-xl
-                    border-2 border-usa-blue/30
-                    shadow-[0_8px_25px_rgba(0,0,0,0.08)]
-                  "
-                  >
-                    <h4
-                      className="
-                      font-display font-bold text-lg mb-4
-                      flex items-center gap-2
+                      p-4
+                      bg-white
+                      rounded-xl
+                      border-2 border-usa-blue/30
+                      shadow-[0_8px_25px_rgba(0,0,0,0.08)]
+                      flex-1 overflow-hidden flex flex-col min-h-0
                     "
-                    >
+                  >
+                    <h4 className="font-display font-bold text-base mb-3 flex items-center gap-2 shrink-0">
                       <span
                         className="
-                        bg-linear-to-r from-usa-red to-usa-blue
-                        w-2 h-6 rounded-full
-                      "
+                          bg-linear-to-r from-usa-red to-usa-blue
+                          w-2 h-5 rounded-full
+                        "
                       />
                       Current Selection
                     </h4>
-                    <ul className="space-y-3">
+                    <ul className="space-y-2 flex-1 overflow-y-auto pr-2">
                       {CATEGORIES.map((cat) => (
                         <li
                           key={cat}
                           className="
-                          flex items-center justify-between
-                          p-2
-                          bg-secondary/50
-                          rounded-lg
-                          hover:bg-secondary/80
-                          transition-colors duration-200 text-black
-                        "
+                            flex items-center justify-between
+                            p-2
+                            bg-secondary/50
+                            rounded-lg
+                            hover:bg-secondary/80
+                            transition-colors duration-200 text-black
+                            text-sm
+                            shrink-0
+                          "
                         >
-                          <span
-                            className="
-                            font-medium capitalize
-                            text-sm
-                          "
-                          >
-                            {cat}
-                          </span>
-                          <span
-                            className="
-                            font-bold
-                           
-                            text-sm
-                          "
-                          >
+                          <span className="font-medium capitalize">{cat}</span>
+                          <span className="font-bold truncate ml-2 max-w-[50%]">
                             {selections[cat]?.name ?? "—"}
                           </span>
                         </li>
@@ -378,7 +358,7 @@ export default function App() {
         </div>
 
         {/* Footer */}
-        <footer className="mt-12 text-center text-sm text-muted-foreground">
+        <footer className="mt-4 text-center text-xs text-muted-foreground shrink-0">
           <p>
             Made with <span className="text-usa-red">❤️</span> and{" "}
             <span className="text-usa-blue">🦅 FREEDOM 🦅</span>
