@@ -159,7 +159,7 @@ export default function App() {
   }
 
   return (
-    <div className="h-screen bg-linear-to-br from-usa-red/15 via-usa-blue/15 to-yellow-300/20 font-body overflow-hidden">
+    <div className="lg:h-screen bg-linear-to-br from-usa-red/15 via-usa-blue/15 to-yellow-300/20 font-body overflow-hidden">
       {/* Halftone background */}
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(0,0,0,0.08)_1px,transparent_0)] bg-size-[24px_24px] opacity-10" />
